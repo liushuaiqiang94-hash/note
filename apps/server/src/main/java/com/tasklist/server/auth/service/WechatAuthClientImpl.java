@@ -1,10 +1,13 @@
 package com.tasklist.server.auth.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tasklist.server.common.error.BusinessException;
 import com.tasklist.server.common.error.ErrorCode;
 import com.tasklist.server.config.WechatProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
@@ -14,6 +17,7 @@ import org.springframework.web.client.RestClient;
 public class WechatAuthClientImpl implements WechatAuthClient {
 
     private final WechatProperties wechatProperties;
+    private final ObjectMapper objectMapper;
 
     @Override
     public WechatSessionInfo code2Session(String code) {
@@ -21,18 +25,28 @@ public class WechatAuthClientImpl implements WechatAuthClient {
             throw new BusinessException(ErrorCode.WECHAT_LOGIN_FAILED, "WeChat appId/appSecret is not configured");
         }
 
-        Code2SessionResponse response = RestClient.builder()
+        String rawResponse = RestClient.builder()
                 .baseUrl(wechatProperties.code2SessionUrl())
                 .build()
                 .get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("appid", wechatProperties.appId())
-                        .queryParam("secret", wechatProperties.appSecret())
-                        .queryParam("js_code", code)
-                        .queryParam("grant_type", "authorization_code")
-                        .build())
+                .uri("?appid={appid}&secret={secret}&js_code={code}&grant_type=authorization_code",
+                        wechatProperties.appId(),
+                        wechatProperties.appSecret(),
+                        code)
+                .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
                 .retrieve()
-                .body(Code2SessionResponse.class);
+                .body(String.class);
+
+        if (!StringUtils.hasText(rawResponse)) {
+            throw new BusinessException(ErrorCode.WECHAT_LOGIN_FAILED, "Empty response from WeChat");
+        }
+
+        Code2SessionResponse response;
+        try {
+            response = objectMapper.readValue(rawResponse, Code2SessionResponse.class);
+        } catch (JsonProcessingException exception) {
+            throw new BusinessException(ErrorCode.WECHAT_LOGIN_FAILED, "Invalid response from WeChat");
+        }
 
         if (response == null || !StringUtils.hasText(response.openId())) {
             throw new BusinessException(ErrorCode.WECHAT_LOGIN_FAILED, "Empty response from WeChat");

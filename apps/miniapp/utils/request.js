@@ -7,6 +7,28 @@ function setUnauthorizedHandler(handler) {
   unauthorizedHandler = handler;
 }
 
+function cleanRequestData(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return data;
+  }
+
+  const cleaned = {};
+  Object.keys(data).forEach((key) => {
+    const value = data[key];
+    if (
+      value === undefined ||
+      value === null ||
+      value === '' ||
+      value === 'undefined' ||
+      value === 'null'
+    ) {
+      return;
+    }
+    cleaned[key] = value;
+  });
+  return cleaned;
+}
+
 function showErrorToast(message) {
   wx.showToast({
     title: message || '请求失败，请稍后重试',
@@ -44,6 +66,7 @@ function request(options) {
 
   return new Promise((resolve, reject) => {
     const requestHeader = { ...header };
+    const requestData = cleanRequestData(data);
     if (auth) {
       requestHeader.Authorization = `Bearer ${getToken()}`;
     }
@@ -51,7 +74,7 @@ function request(options) {
     wx.request({
       url: `${BASE_URL}${url}`,
       method,
-      data,
+      data: requestData,
       header: requestHeader,
       success: (response) => {
         const payload = response.data || {};
@@ -107,4 +130,5 @@ module.exports = {
   patch,
   del,
   setUnauthorizedHandler,
+  cleanRequestData,
 };
