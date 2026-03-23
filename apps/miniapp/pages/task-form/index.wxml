@@ -1,0 +1,146 @@
+<view class="app-page">
+  <view class="page-header">
+    <view class="page-title">{{isEdit ? '编辑任务' : '新增任务'}}</view>
+    <view class="page-subtitle">先保证任务表单完整可用，重复任务和提醒发送后续再增强。</view>
+  </view>
+
+  <view class="section-card">
+    <view class="weui-cells__title">基础信息</view>
+    <view class="weui-cells weui-cells_form">
+      <view class="weui-cell">
+        <view class="weui-cell__hd"><view class="weui-label">标题</view></view>
+        <view class="weui-cell__bd">
+          <input
+            class="weui-input"
+            type="text"
+            maxlength="50"
+            placeholder="例如：完成周报"
+            value="{{form.title}}"
+            bindinput="handleTitleInput"
+          />
+        </view>
+      </view>
+
+      <picker mode="selector" range="{{categoryPickerOptions}}" value="{{selectedCategoryIndex}}" bindchange="handleCategoryChange">
+        <view class="weui-cell weui-cell_access">
+          <view class="weui-cell__hd"><view class="weui-label">分类</view></view>
+          <view class="weui-cell__bd">
+            <view>{{categoryPickerOptions[selectedCategoryIndex]}}</view>
+          </view>
+          <view class="weui-cell__ft"></view>
+        </view>
+      </picker>
+
+      <picker mode="selector" range="{{priorityOptions}}" range-key="label" value="{{selectedPriorityIndex}}" bindchange="handlePriorityChange">
+        <view class="weui-cell weui-cell_access">
+          <view class="weui-cell__hd"><view class="weui-label">优先级</view></view>
+          <view class="weui-cell__bd">
+            <view>{{priorityOptions[selectedPriorityIndex].label}}</view>
+          </view>
+          <view class="weui-cell__ft"></view>
+        </view>
+      </picker>
+
+      <picker mode="selector" range="{{repeatOptions}}" range-key="label" value="{{selectedRepeatIndex}}" bindchange="handleRepeatChange">
+        <view class="weui-cell weui-cell_access">
+          <view class="weui-cell__hd"><view class="weui-label">重复类型</view></view>
+          <view class="weui-cell__bd">
+            <view>{{repeatOptions[selectedRepeatIndex].label}}</view>
+          </view>
+          <view class="weui-cell__ft"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view class="weui-cells__title">备注</view>
+    <view class="weui-cells weui-cells_form">
+      <view class="weui-cell">
+        <view class="weui-cell__bd">
+          <textarea
+            class="weui-textarea task-textarea"
+            maxlength="200"
+            placeholder="补充说明、上下文或执行提醒"
+            value="{{form.description}}"
+            bindinput="handleDescriptionInput"
+          ></textarea>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="weui-cells__title">时间设置</view>
+    <view class="weui-cells weui-cells_form">
+      <picker mode="date" value="{{form.dueDate}}" bindchange="handleDueDateChange">
+        <view class="weui-cell weui-cell_access">
+          <view class="weui-cell__hd"><view class="weui-label">截止日期</view></view>
+          <view class="weui-cell__bd">
+            <view>{{form.dueDate || '未设置'}}</view>
+          </view>
+          <view class="weui-cell__ft"></view>
+        </view>
+      </picker>
+      <picker mode="time" value="{{form.dueTime}}" bindchange="handleDueTimeChange">
+        <view class="weui-cell weui-cell_access">
+          <view class="weui-cell__hd"><view class="weui-label">截止时间</view></view>
+          <view class="weui-cell__bd">
+            <view>{{form.dueTime || '未设置'}}</view>
+          </view>
+          <view class="weui-cell__ft"></view>
+        </view>
+      </picker>
+      <picker mode="date" value="{{form.remindDate}}" bindchange="handleRemindDateChange">
+        <view class="weui-cell weui-cell_access">
+          <view class="weui-cell__hd"><view class="weui-label">提醒日期</view></view>
+          <view class="weui-cell__bd">
+            <view>{{form.remindDate || '未设置'}}</view>
+          </view>
+          <view class="weui-cell__ft"></view>
+        </view>
+      </picker>
+      <picker mode="time" value="{{form.remindTime}}" bindchange="handleRemindTimeChange">
+        <view class="weui-cell weui-cell_access">
+          <view class="weui-cell__hd"><view class="weui-label">提醒时间</view></view>
+          <view class="weui-cell__bd">
+            <view>{{form.remindTime || '未设置'}}</view>
+          </view>
+          <view class="weui-cell__ft"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view class="section-desc">当前只保存提醒时间和重复字段，不代表已经接入微信订阅消息发送。</view>
+  </view>
+
+  <view class="page-actions">
+    <button class="weui-btn weui-btn_primary primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="handleSave">
+      {{saving ? '保存中...' : '保存任务'}}
+    </button>
+
+    <button
+      wx:if="{{isEdit}}"
+      class="weui-btn weui-btn_default secondary-button"
+      bindtap="handleToggleStatus"
+    >
+      {{taskStatus === 'DONE' ? '恢复未完成' : '标记完成'}}
+    </button>
+
+    <button
+      wx:if="{{isEdit}}"
+      class="weui-btn weui-btn_warn secondary-button"
+      bindtap="openDeleteDialog"
+    >
+      删除任务
+    </button>
+  </view>
+
+  <view class="weui-mask" wx:if="{{showDeleteDialog}}" bindtap="closeDeleteDialog"></view>
+  <view class="weui-dialog" wx:if="{{showDeleteDialog}}">
+    <view class="weui-dialog__hd"><view class="weui-dialog__title">删除任务</view></view>
+    <view class="weui-dialog__bd">删除后任务会进入回收站，7 天后自动清理。</view>
+    <view class="weui-dialog__ft">
+      <view class="weui-dialog__btn weui-dialog__btn_default" bindtap="closeDeleteDialog">取消</view>
+      <view class="weui-dialog__btn weui-dialog__btn_primary" bindtap="confirmDelete">确认删除</view>
+    </view>
+  </view>
+</view>

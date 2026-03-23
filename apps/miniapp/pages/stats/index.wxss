@@ -1,0 +1,25 @@
+.trend-list {
+  margin-top: 18rpx;
+}
+
+.trend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid #edf1f5;
+  font-size: 26rpx;
+}
+
+.trend-row:last-child {
+  border-bottom: none;
+}
+
+.trend-row__date {
+  color: #374151;
+}
+
+.trend-row__count {
+  color: #07c160;
+  font-weight: 600;
+}

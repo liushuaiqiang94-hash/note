@@ -1,0 +1,12 @@
+{
+  "name": "task-list-miniapp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Task list WeChat mini program",
+  "scripts": {
+    "check:json": "node -e \"const fs=require('fs');const path=require('path');const walk=(dir)=>fs.readdirSync(dir,{withFileTypes:true}).forEach((item)=>{const full=path.join(dir,item.name);if(item.isDirectory()) return walk(full);if(full.endsWith('.json')) JSON.parse(fs.readFileSync(full,'utf8'));});walk('.')\""
+  },
+  "dependencies": {
+    "weui-miniprogram": "^1.5.6"
+  }
+}

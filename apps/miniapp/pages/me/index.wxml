@@ -1,0 +1,54 @@
+<view class="app-page">
+  <view class="page-header">
+    <view class="page-title">我的</view>
+    <view class="page-subtitle">集中查看账号信息和当前已开放的个人功能入口。</view>
+  </view>
+
+  <view class="section-card profile-card">
+    <view class="profile-card__main">
+      <image wx:if="{{profile && profile.avatarUrl}}" class="profile-card__avatar" mode="aspectFill" src="{{profile.avatarUrl}}" />
+      <view wx:else class="profile-card__avatar profile-card__avatar--placeholder">我</view>
+      <view class="profile-card__content">
+        <view class="profile-card__name">{{profile ? profile.nickName : '微信用户'}}</view>
+        <view class="profile-card__meta">当前账号的任务、分类和统计数据都会与此身份绑定。</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">功能入口</view>
+    <view class="weui-cells" style="margin-top: 18rpx;">
+      <view class="weui-cell weui-cell_access" bindtap="goCategories">
+        <view class="weui-cell__bd">
+          <view>分类管理</view>
+        </view>
+        <view class="weui-cell__ft">维护任务分类</view>
+      </view>
+      <view class="weui-cell weui-cell_access" bindtap="goRecycleBin">
+        <view class="weui-cell__bd">
+          <view>回收站</view>
+        </view>
+        <view class="weui-cell__ft">恢复 7 天内删除的任务</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">当前说明</view>
+    <view class="section-desc">提醒设置、意见反馈、关于我们等页面先不展示，避免出现无后端支持的伪入口。</view>
+  </view>
+
+  <view class="page-actions">
+    <button class="weui-btn weui-btn_warn primary-button" bindtap="openLogoutDialog">退出登录</button>
+  </view>
+
+  <view class="weui-mask" wx:if="{{showLogoutDialog}}" bindtap="closeLogoutDialog"></view>
+  <view class="weui-dialog" wx:if="{{showLogoutDialog}}">
+    <view class="weui-dialog__hd"><view class="weui-dialog__title">退出登录</view></view>
+    <view class="weui-dialog__bd">退出后会清空本地 token，需要重新发起微信登录。</view>
+    <view class="weui-dialog__ft">
+      <view class="weui-dialog__btn weui-dialog__btn_default" bindtap="closeLogoutDialog">取消</view>
+      <view class="weui-dialog__btn weui-dialog__btn_primary" bindtap="confirmLogout">确认退出</view>
+    </view>
+  </view>
+</view>

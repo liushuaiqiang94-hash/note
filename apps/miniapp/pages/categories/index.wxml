@@ -1,0 +1,95 @@
+<view class="app-page">
+  <view class="page-header">
+    <view class="page-title">分类管理</view>
+    <view class="page-subtitle">删除分类后，原任务会自动变为未分类，所以这里不做复杂层级。</view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">{{editingId ? '编辑分类' : '新增分类'}}</view>
+    <view class="weui-cells weui-cells_form" style="margin-top: 18rpx;">
+      <view class="weui-cell">
+        <view class="weui-cell__hd"><view class="weui-label">名称</view></view>
+        <view class="weui-cell__bd">
+          <input
+            class="weui-input"
+            type="text"
+            maxlength="20"
+            placeholder="例如：工作 / 学习 / 生活"
+            value="{{form.name}}"
+            bindinput="handleNameInput"
+          />
+        </view>
+      </view>
+      <view class="weui-cell">
+        <view class="weui-cell__hd"><view class="weui-label">排序</view></view>
+        <view class="weui-cell__bd">
+          <input
+            class="weui-input"
+            type="digit"
+            maxlength="6"
+            placeholder="0"
+            value="{{form.sortNo}}"
+            bindinput="handleSortNoInput"
+          />
+        </view>
+      </view>
+    </view>
+
+    <view class="section-desc">颜色只用于分类识别，不承载额外状态语义。</view>
+    <view class="chip-row">
+      <view
+        wx:for="{{colorOptions}}"
+        wx:key="*this"
+        class="color-chip {{form.color === item ? 'color-chip--active' : ''}}"
+        data-color="{{item}}"
+        bindtap="selectColor"
+      >
+        <view class="color-chip__dot" style="background: {{item}};"></view>
+        <text>{{item}}</text>
+      </view>
+    </view>
+
+    <view class="page-actions">
+      <button class="weui-btn weui-btn_primary primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="handleSave">
+        {{editingId ? '更新分类' : '新增分类'}}
+      </button>
+      <button wx:if="{{editingId}}" class="weui-btn weui-btn_default secondary-button" bindtap="resetForm">取消编辑</button>
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">分类列表</view>
+    <view class="empty-card" wx:if="{{!loading && categories.length === 0}}">
+      还没有分类，先创建一个常用分类吧。
+    </view>
+
+    <view class="category-row" wx:for="{{categories}}" wx:key="id">
+      <view class="category-row__main">
+        <view class="category-row__title">
+          <view class="category-row__dot" style="background: {{item.color || '#07c160'}};"></view>
+          <text>{{item.name}}</text>
+        </view>
+        <view class="category-row__meta">排序 {{item.sortNo || 0}}</view>
+      </view>
+      <view class="category-row__actions">
+        <button class="weui-btn weui-btn_mini weui-btn_default" data-id="{{item.id}}" bindtap="editCategory">编辑</button>
+        <button class="weui-btn weui-btn_mini weui-btn_warn" data-id="{{item.id}}" bindtap="openDeleteDialog">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="weui-loadmore" wx:if="{{loading}}">
+    <view class="weui-loading"></view>
+    <view class="weui-loadmore__tips">分类加载中</view>
+  </view>
+
+  <view class="weui-mask" wx:if="{{showDeleteDialog}}" bindtap="closeDeleteDialog"></view>
+  <view class="weui-dialog" wx:if="{{showDeleteDialog}}">
+    <view class="weui-dialog__hd"><view class="weui-dialog__title">删除分类</view></view>
+    <view class="weui-dialog__bd">删除后原任务会保留，但分类会变为未分类。</view>
+    <view class="weui-dialog__ft">
+      <view class="weui-dialog__btn weui-dialog__btn_default" bindtap="closeDeleteDialog">取消</view>
+      <view class="weui-dialog__btn weui-dialog__btn_primary" bindtap="confirmDelete">确认删除</view>
+    </view>
+  </view>
+</view>

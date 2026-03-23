@@ -1,0 +1,3 @@
+.task-textarea {
+  min-height: 180rpx;
+}

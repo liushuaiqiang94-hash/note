@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: task-list-server
+  datasource:
+    url: jdbc:mysql://localhost:3306/task_list?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  mvc:
+    format:
+      date-time: yyyy-MM-dd HH:mm:ss
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  jwt:
+    issuer: task-list-server
+    secret: change-me-to-a-long-secret-key-at-least-32
+    access-token-expire-seconds: 604800
+  wechat:
+    app-id:
+    app-secret:
+    code2-session-url: https://api.weixin.qq.com/sns/jscode2session

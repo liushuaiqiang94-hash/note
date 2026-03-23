@@ -1,0 +1,5 @@
+apps/server/target/
+apps/miniapp/node_modules/
+apps/miniapp/miniprogram_npm/
+apps/miniapp/dist/
+

@@ -1,0 +1,45 @@
+<view class="login-page">
+  <view class="weui-toptips weui-toptips_warn" wx:if="{{showTips}}">{{tipMessage}}</view>
+
+  <view class="login-hero">
+    <view class="login-badge">Task List</view>
+    <view class="login-title">任务清单</view>
+    <view class="login-subtitle">
+      用微信原生小程序的方式，把任务、分类和统计集中在一个轻量入口里。
+    </view>
+  </view>
+
+  <view class="login-card">
+    <view class="login-card__title">今天就开始整理你的待办</view>
+    <view class="login-card__desc">
+      登录后即可同步任务、维护分类、查看近 7 天和近 30 天的完成趋势。
+    </view>
+
+    <view class="login-points">
+      <view class="login-point">
+        <view class="login-point__dot"></view>
+        <text>快速记录任务</text>
+      </view>
+      <view class="login-point">
+        <view class="login-point__dot"></view>
+        <text>按分类管理清单</text>
+      </view>
+      <view class="login-point">
+        <view class="login-point__dot"></view>
+        <text>查看完成率和连续完成天数</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="login-footer">
+    <button
+      class="weui-btn weui-btn_primary primary-button"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+      bindtap="handleWechatLogin"
+    >
+      {{loading ? '登录中...' : '微信授权登录'}}
+    </button>
+    <view class="login-notice">首次登录会自动创建账号，并拉取当前用户资料。</view>
+  </view>
+</view>

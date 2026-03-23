@@ -1,0 +1,9 @@
+{
+  "desc": "task-list-miniapp sitemap",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

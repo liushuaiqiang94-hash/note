@@ -1,0 +1,152 @@
+<view class="app-page">
+  <view class="page-header">
+    <view class="page-title">任务</view>
+    <view class="page-subtitle">
+      {{userProfile && userProfile.nickName ? userProfile.nickName : '微信用户'}}，从这里管理你的全部待办。
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">今日概览</view>
+    <view class="section-desc">顶部维持简洁，先让你看到今天的执行情况和当前筛选条件。</view>
+    <view class="metrics-grid">
+      <view class="metric-card">
+        <view class="metric-label">今日任务</view>
+        <text class="metric-value">{{todaySummary.total}}</text>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">已完成</view>
+        <text class="metric-value">{{todaySummary.done}}</text>
+      </view>
+      <view class="metric-card">
+        <view class="metric-label">完成率</view>
+        <text class="metric-value">{{todaySummary.rateText}}</text>
+      </view>
+      <view class="metric-card" bindtap="toggleTodayOnly">
+        <view class="metric-label">范围</view>
+        <text class="metric-value">{{todayOnly ? '仅今天' : '全部'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">搜索与筛选</view>
+
+    <view class="weui-search-bar {{searchFocused ? 'weui-search-bar_focusing' : ''}}" id="searchBar">
+      <view class="weui-search-bar__form">
+        <view class="weui-search-bar__box">
+          <icon class="weui-icon-search-in-box" type="search" size="14"></icon>
+          <input
+            class="weui-search-bar__input"
+            type="text"
+            confirm-type="search"
+            placeholder="搜索标题或备注"
+            value="{{keyword}}"
+            bindfocus="handleSearchFocus"
+            bindblur="handleSearchBlur"
+            bindinput="handleKeywordInput"
+          />
+          <view class="weui-icon-clear" wx:if="{{keyword}}" bindtap="handleKeywordClear"></view>
+        </view>
+        <label class="weui-search-bar__label" wx:if="{{!keyword && !searchFocused}}">
+          <icon class="weui-icon-search" type="search" size="14"></icon>
+          <text>搜索任务</text>
+        </label>
+      </view>
+      <view class="weui-search-bar__cancel-btn" bindtap="handleKeywordClear">取消</view>
+    </view>
+
+    <view class="chip-row">
+      <view
+        wx:for="{{statusOptions}}"
+        wx:key="value"
+        class="chip {{selectedStatus === item.value ? 'chip--active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="selectStatus"
+      >
+        {{item.label}}
+      </view>
+      <view class="chip {{todayOnly ? 'chip--active' : ''}}" bindtap="toggleTodayOnly">
+        {{todayOnly ? '今日任务' : '全部日期'}}
+      </view>
+    </view>
+
+    <picker mode="selector" range="{{categoryPickerOptions}}" value="{{selectedCategoryIndex}}" bindchange="handleCategoryChange">
+      <view class="weui-cell weui-cell_access filter-cell">
+        <view class="weui-cell__bd">
+          <view>分类筛选</view>
+        </view>
+        <view class="weui-cell__ft">{{categoryPickerOptions[selectedCategoryIndex]}}</view>
+      </view>
+    </picker>
+  </view>
+
+  <view class="stack">
+    <view class="empty-card" wx:if="{{!loading && tasks.length === 0}}">
+      {{keyword ? '没有找到匹配的任务，试试更短的关键词。' : '当前没有任务，先创建一个新的待办。'}}
+    </view>
+
+    <view
+      class="section-card task-card {{item.isExpired ? 'status-muted' : ''}}"
+      wx:for="{{tasks}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goTaskForm"
+    >
+      <view class="task-card__top">
+        <view class="task-card__title">{{item.title}}</view>
+        <view class="chip {{item.statusClass}}">{{item.statusText}}</view>
+      </view>
+
+      <view class="task-card__desc">{{item.descriptionText}}</view>
+
+      <view class="task-card__meta">
+        <view class="task-card__meta-item">截止：{{item.dueText}}</view>
+        <view class="task-card__meta-item">分类：{{item.categoryName}}</view>
+      </view>
+
+      <view class="task-card__chips">
+        <view class="chip {{item.priorityClass}}">{{item.priorityText}}</view>
+      </view>
+
+      <view class="task-card__actions">
+        <button
+          class="weui-btn weui-btn_mini {{item.isDone ? 'weui-btn_default' : 'weui-btn_primary'}}"
+          catchtap="toggleTaskStatus"
+          data-id="{{item.id}}"
+          data-status="{{item.status}}"
+        >
+          {{item.isDone ? '恢复' : '完成'}}
+        </button>
+        <button class="weui-btn weui-btn_mini weui-btn_default" catchtap="goTaskForm" data-id="{{item.id}}">编辑</button>
+        <button class="weui-btn weui-btn_mini weui-btn_warn" catchtap="openDeleteDialog" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="weui-loadmore" wx:if="{{loading}}">
+    <view class="weui-loading"></view>
+    <view class="weui-loadmore__tips">任务加载中</view>
+  </view>
+
+  <view class="weui-loadmore" wx:if="{{loadingMore}}">
+    <view class="weui-loading"></view>
+    <view class="weui-loadmore__tips">加载更多任务</view>
+  </view>
+
+  <view class="floating-create">
+    <button class="weui-btn weui-btn_primary primary-button" bindtap="goTaskForm">新增任务</button>
+  </view>
+
+  <view class="footer-safe-area"></view>
+
+  <view class="weui-mask" wx:if="{{showDeleteDialog}}" bindtap="closeDeleteDialog"></view>
+  <view class="weui-dialog" wx:if="{{showDeleteDialog}}">
+    <view class="weui-dialog__hd"><view class="weui-dialog__title">删除任务</view></view>
+    <view class="weui-dialog__bd">删除后任务会进入回收站，并在 7 天后自动清理。</view>
+    <view class="weui-dialog__ft">
+      <view class="weui-dialog__btn weui-dialog__btn_default" bindtap="closeDeleteDialog">取消</view>
+      <view class="weui-dialog__btn weui-dialog__btn_primary" bindtap="confirmDelete">确认删除</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,37 @@
+<view class="app-page">
+  <view class="page-header">
+    <view class="page-title">回收站</view>
+    <view class="page-subtitle">这里只提供恢复操作，不提供永久删除。任务会在 7 天后自动清理。</view>
+  </view>
+
+  <view class="empty-card" wx:if="{{!loading && tasks.length === 0}}">
+    回收站目前是空的。
+  </view>
+
+  <view class="section-card recycle-card" wx:for="{{tasks}}" wx:key="id">
+    <view class="task-card__top">
+      <view class="task-card__title">{{item.title}}</view>
+      <view class="chip {{item.statusClass}}">{{item.statusText}}</view>
+    </view>
+    <view class="task-card__meta">
+      <view class="task-card__meta-item">截止：{{item.dueText}}</view>
+      <view class="task-card__meta-item">删除时间：{{item.deletedText}}</view>
+    </view>
+    <view class="task-card__chips">
+      <view class="chip {{item.priorityClass}}">{{item.priorityText}}</view>
+    </view>
+    <view class="page-actions">
+      <button class="weui-btn weui-btn_primary secondary-button" data-id="{{item.id}}" bindtap="restoreTask">恢复任务</button>
+    </view>
+  </view>
+
+  <view class="weui-loadmore" wx:if="{{loading}}">
+    <view class="weui-loading"></view>
+    <view class="weui-loadmore__tips">回收站加载中</view>
+  </view>
+
+  <view class="weui-loadmore" wx:if="{{loadingMore}}">
+    <view class="weui-loading"></view>
+    <view class="weui-loadmore__tips">加载更多任务</view>
+  </view>
+</view>

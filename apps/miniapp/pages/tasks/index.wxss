@@ -1,0 +1,57 @@
+.filter-cell {
+  margin-top: 18rpx;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.task-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.task-card__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #111827;
+}
+
+.task-card__desc {
+  margin-top: 14rpx;
+  font-size: 25rpx;
+  line-height: 1.7;
+  color: #6b7280;
+}
+
+.task-card__meta {
+  margin-top: 18rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.task-card__meta-item {
+  font-size: 24rpx;
+  color: #7a7f87;
+}
+
+.task-card__chips {
+  margin-top: 18rpx;
+}
+
+.task-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 22rpx;
+}
+
+.floating-create {
+  position: sticky;
+  bottom: 24rpx;
+  margin-top: 28rpx;
+}
